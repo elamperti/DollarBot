@@ -73,28 +73,52 @@ def get_patagonia():
 
 
 bancos = [
-    ('santander', get_santander),
-    ('nacion', get_nacion),
-    ('bbva', get_bbva),
-    ('bolsa', get_bolsa),
-    ('galicia', get_galicia),
-    ('patagonia', get_patagonia),
+    ('santander', 'Banco Santander', get_santander, re.compile('santander|rio', flags=re.IGNORECASE)),
+    ('nacion', 'Banco Nación', get_nacion, re.compile('naci[oó]n|bna', flags=re.IGNORECASE)),
+    ('frances', 'Banco Francés', get_bbva, re.compile('franc[eé]s|bbva?', flags=re.IGNORECASE)),
+    ('bolsa', 'Bolsa', get_bolsa, re.compile('bolsa|bonar', flags=re.IGNORECASE)),
+    ('galicia', 'Banco Galicia', get_galicia, re.compile('galicia', flags=re.IGNORECASE)),
+    ('patagonia', 'Banco Patagonia', get_patagonia, re.compile('patagonia|bp', flags=re.IGNORECASE)),
 ]
+
+def detailed_list():
+    message = '```'
+    for ugly_name, banco, getter, alias in bancos: 
+        try:
+            value = getter()
+            message += "\n{}: ${:,.2f}".format(banco, value)
+        except:
+            print('Error obteniendo {nombre}'.format(nombre=banco))
+    if (len(message) == 3):
+        message += "\nNo se pudo obtener ningún valor"
+    message += "\n```"
+    return message
 
 def dolar_average():
     sum_values = 0
-    for banco, getter in bancos: 
+    for ugly_name, banco, getter, alias in bancos: 
         try:
             value = getter()
             sum_values += value
-            dolar_values[banco] = value
-            print('Dolar {nombre}: $ {value}'.format(nombre=banco, value=value))
+            dolar_values[ugly_name] = value
+            # print('Dólar {nombre}: $ {value}'.format(nombre=banco, value=value))
         except:
             print('Error obteniendo {nombre}'.format(nombre=banco))
 
     if (sum_values > 0):
         promedio = sum_values / len(dolar_values)
-        print('Promedio: $ {prom}'.format(prom=str(promedio)))
+        # print('Promedio: $ {prom}'.format(prom=str(promedio)))
         return promedio
     else:
         return False
+
+def get_one(name):
+    for ugly_name, banco, getter, alias in bancos:
+        matches = alias.match(name)
+        if (matches):
+            value = getter()
+            if value:
+                return ':bank: {}: ${:,.2f}'.format(banco, value)
+            else:
+                return ':x: No se pudo obtener un valor para {nombre}'.format(banco)
+    return ':grey_question: Banco desconocido'
