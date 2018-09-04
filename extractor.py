@@ -17,11 +17,11 @@ dolar_values = {}
 
 
 def parse_dolar(val):
-    groups = regex_dolar.search(val)
-    if (not groups):
+    match = regex_dolar.search(val)
+    if (not match):
         return False
     else:
-        dolar = float(groups[1] + '.' + groups[2])
+        dolar = float(match.group(1) + '.' + match.group(2))
         return dolar
 
 def get_santander():
@@ -62,7 +62,7 @@ def get_bolsa():
 
 def get_galicia():
     url = 'https://www.bancogalicia.com/cotizacion/cotizar?currencyId=02&quoteType=SU&quoteId=999'
-    rs = json.loads(request.urlopen(url).read())
+    rs = json.loads(requests.get(url).text)
     return parse_dolar(rs['sell'])
 
 def get_patagonia():
