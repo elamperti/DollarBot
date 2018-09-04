@@ -99,8 +99,9 @@ def dolar_average():
     for ugly_name, banco, getter, alias in bancos: 
         try:
             value = getter()
-            sum_values += value
-            dolar_values[ugly_name] = value
+            if value and value > 0:
+                sum_values += value
+                dolar_values[ugly_name] = value
             # print('Dólar {nombre}: $ {value}'.format(nombre=banco, value=value))
         except:
             print('Error obteniendo {nombre}'.format(nombre=banco))
