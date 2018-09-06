@@ -10,6 +10,7 @@ from discord.ext import commands
 
 import extractor
 
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 load_dotenv('.env.local' if (os.path.isfile('.env.local')) else '.env')
 
 client = commands.Bot(command_prefix='!')
