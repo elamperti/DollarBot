@@ -71,14 +71,23 @@ def get_patagonia():
         tmp = soup.find('td', string='DOLARES').find_next_siblings()[1].string
         return parse_dolar(tmp)
 
+def get_hipotecario():
+    url = 'http://www.hipotecario.com.ar/cotizaciones.aspx'
+    rq = requests.get(url, verify=False)
+    print('rq')
+    print(rq.text)
+    soup = BeautifulSoup(rq.text, 'html.parser')
+    tmp = soup.find(id='lbdolCpa')[0].string
+    return parse_dolar(tmp)
 
 bancos = [
     ('santander', 'Banco Santander', get_santander, re.compile('santander|rio', flags=re.IGNORECASE)),
     ('nacion', 'Banco Nación', get_nacion, re.compile('naci[oó]n|bna', flags=re.IGNORECASE)),
     ('frances', 'Banco Francés', get_bbva, re.compile('franc[eé]s|bbva?', flags=re.IGNORECASE)),
-    ('bolsa', 'Bolsa', get_bolsa, re.compile('bolsa|bonar', flags=re.IGNORECASE)),
+    #('bolsa', 'Bolsa', get_bolsa, re.compile('bolsa|bonar', flags=re.IGNORECASE)),
     ('galicia', 'Banco Galicia', get_galicia, re.compile('galicia', flags=re.IGNORECASE)),
     ('patagonia', 'Banco Patagonia', get_patagonia, re.compile('patagonia|bp', flags=re.IGNORECASE)),
+    # ('hipotecario', 'Banco Hipotecario', get_hipotecario, re.compile('hipotecario', flags=re.IGNORECASE)),
 ]
 
 def detailed_list():
@@ -95,7 +104,7 @@ def detailed_list():
     return message
 
 def dolar_average():
-    sum_values = 0
+    sum_values = 0.0
     for ugly_name, banco, getter, alias in bancos: 
         try:
             value = getter()
@@ -106,7 +115,7 @@ def dolar_average():
         except:
             print('Error obteniendo {nombre}'.format(nombre=banco))
 
-    if (sum_values > 0):
+    if (sum_values > 0.0):
         promedio = sum_values / len(dolar_values)
         # print('Promedio: $ {prom}'.format(prom=str(promedio)))
         return promedio
